@@ -1,4 +1,4 @@
-const {produts,users, OrderDetails} = require('../models/products')
+const {produts,users, OrderDetails, OrderDelivery} = require('../models/products')
 
 const getProducts = async (req,res)=>{
     try{
@@ -173,8 +173,13 @@ res.status(500).json(err);
 
 const deleteOrder = async(req,res)=>{
   try{
-const {_id} = req.params;
-const result = await OrderDetails.deleteOne(_id);
+const {id} = req.params;
+const data = await OrderDetails.findById({_id:id});
+const some = data.product.map(async (val)=>{
+  await produts.updateOne({_id:val._id},{$inc :{count:Number(val.quantity)}})
+});
+await Promise.all(some);
+const result = await OrderDetails.deleteOne({_id:id});
 res.status(200).json(result);
 
   }catch(err){
@@ -182,4 +187,61 @@ res.status(500).json(err);
   }
 }
 
-module.exports = {deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}
+
+const getGroceryByID = async(req,res)=>{
+  try{
+const {_id} = req.params;
+const data = await produts.find({_id:_id});
+        res.status(200).json(data);
+
+  }catch(err){
+res.status(500).json(err);
+  }
+}
+
+
+const Delivery = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Fetch single document (not array)
+    const data = await OrderDetails.findById(id); // ✅ use findById
+
+    if (!data) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Create new OrderDelivery with the document
+    const val = new OrderDelivery({
+      _id: data._id,
+      product: data.product,
+      location: data.location,
+      mode: data.mode,
+      userID: data.userID
+      // add other fields as needed
+    });
+
+    const result = await val.save();
+
+    // Delete the original
+    await OrderDetails.deleteOne({ _id: id });
+
+    res.status(200).json(result);
+  } catch (err) {
+    console.error("Delivery Error:", err);
+    res.status(500).json({ error: "Internal Server Error", details: err.message });
+  }
+};
+
+const getOrderHistory = async (req,res)=>{
+  try{
+    const {userID} = req.params;
+    const result = await   OrderDelivery.find({userID});
+    res.status(200).json(result);
+
+  }catch(err){
+res.status(500).json(err);
+  }
+}
+
+module.exports = {getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}

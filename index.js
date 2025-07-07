@@ -1,8 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const connectionDB = require('./config/db');
-const  {deleteOrder, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin, updateUserDetails,getOrderDetails} = require('./controllers/produtcsControllers')
+const  {getOrderHistory,Delivery,getGroceryByID,deleteOrder, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin, updateUserDetails,getOrderDetails} = require('./controllers/produtcsControllers')
 const app = express();
+const sendOTP = require('./controllers/sendOTP');
 connectionDB();
 app.use(cors());
 app.use(express.json())
@@ -10,6 +11,7 @@ app.use(express.json())
 app.get('/getAllProducts',getProducts);
 app.post('/postdata',postProduts);
 app.get('/getGrocery', getGrocery);
+app.get('/getGroceryByID/:_id', getGroceryByID);
 app.get('/getGroceryBySearch/:search',getGroceryBySearch)
 app.put('/addToCart',addToCart);
 app.get('/getCartDetails/:userID',getCartDetails);
@@ -20,4 +22,7 @@ app.post('/userLogin',userLogin);
 app.put('/updateUserDetails',updateUserDetails);
 app.get('/getOrderDetails/:_id',getOrderDetails);
 app.delete('/deleteOrder/:id',deleteOrder);
+app.post('/send-otp', sendOTP);
+app.post('/Delivery/:id',Delivery);
+app.get('/getOrderHistory/:userID',getOrderHistory);
 app.listen(4000,()=>console.log("server running on port 4000"));

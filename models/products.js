@@ -40,4 +40,19 @@ const OrderDetailsSchema = mongoose.Schema({
 
   const OrderDetails = mongoose.model("OrderDetails",OrderDetailsSchema);
 
-module.exports = {produts,users, OrderDetails};
+  const OrderDeliverySchema = mongoose.Schema({
+    product:[],
+    location : {
+      City : String,
+      Pincode : String,
+      address : String,
+      lat : Number,
+      lng : Number
+    },
+    mode : String,
+    userID : String 
+  })
+
+  const OrderDelivery = mongoose.model("OrderDelivery",OrderDeliverySchema);
+
+module.exports = {produts,users, OrderDetails, OrderDelivery};
