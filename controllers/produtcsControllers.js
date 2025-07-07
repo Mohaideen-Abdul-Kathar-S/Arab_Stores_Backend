@@ -92,16 +92,31 @@ const removeFromCart = async (req,res)=>{
         res.status(500).json({"message":err});
     }
 }
+
+
 const postOrderDetails = async (req, res) => {
   try {
-    const order = new OrderDetails(req.body); // ✅ correct way
-    const result = await order.save();        // ✅ await is important
+    const data = req.body;
+    const order = new OrderDetails(data);
+    const result = await order.save();
+
+    // Ensure all product updates are awaited
+    const updatePromises = data.product.map(async (val) => {
+      const id = val._id;
+      const remcount = Number(val.count) - Number(val.quantity);
+      console.log(`id ${id} rem ${remcount} count ${val.count} quant ${val.quantity}`);
+      await produts.updateOne({ _id: id }, { $set: { count: remcount } });
+    });
+
+    await Promise.all(updatePromises); // Wait for all updates to complete
+
     res.status(200).json(result);
   } catch (err) {
-    console.error("Error saving order:", err); // ✅ log the real error
+    console.error("Error saving order:", err);
     res.status(500).json({ message: "server error" });
   }
 };
+
 
 const userRegister = async(req,res)=>{
   try{
@@ -129,4 +144,42 @@ const userLogin = async (req,res)=>{
     res.status(500).json(err);
   }
 }
-module.exports = {getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin}
+
+
+const updateUserDetails = async(req,res)=>{
+  try{
+    console.log("user frofile update");
+    const {name,gender,nameofhouse,city,addr,userID} =req.body;
+    const result = await users.updateOne( { _id:userID },{$set : {userName:name,userCity:city,userAddr:addr,userGender:gender,userNOH:nameofhouse} });
+
+      res.status(200).json(result);
+
+  }catch(err){
+    res.status(500).json(err);
+  }
+}
+
+const getOrderDetails = async(req,res)=>{
+  try{
+    const _id = req.params;
+    const result = await   OrderDetails.find({userID:_id});
+    res.status(200).json(result);
+
+  }catch(err){
+res.status(500).json(err);
+  }
+}
+
+
+const deleteOrder = async(req,res)=>{
+  try{
+const {_id} = req.params;
+const result = await OrderDetails.deleteOne(_id);
+res.status(200).json(result);
+
+  }catch(err){
+res.status(500).json(err);
+  }
+}
+
+module.exports = {deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}

@@ -16,6 +16,10 @@ const userSchema = mongoose.Schema({
   _id : String,
   userName : String,
   userPassword: String,
+  userCity : String,
+  userAddr : String,
+  userGender : String,
+  userNOH : String,
   userCart : Array
 })
 
