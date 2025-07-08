@@ -244,4 +244,13 @@ res.status(500).json(err);
   }
 }
 
-module.exports = {getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}
+const getCustomersOrders = async (req,res)=>{
+  try{
+    const result = await OrderDetails.find();
+    res.status(200).json(result);
+  }catch(err){
+    res.status(500).json(err);
+  }
+}
+
+module.exports = {getCustomersOrders, getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}
