@@ -253,4 +253,58 @@ const getCustomersOrders = async (req,res)=>{
   }
 }
 
-module.exports = {getCustomersOrders, getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}
+const CheckUserID = async (req,res)=>{
+  try{
+    const {email} = req.body;
+    console.log(email);
+    const result = await users.findOne({_id:email});
+    if(!result){
+      res.status(500).json(err);
+    }
+    res.status(200).json(result);
+
+  }catch(err){
+    res.status(500).json(err);
+  }
+}
+
+const updatePassword = async(req,res)=>{
+  try{
+    const {_id,userPassword} = req.body;
+    const result = await users.updateOne({_id},{$set : {userPassword : userPassword}});
+    res.status(200).json(result);
+
+  }catch(err){
+    res.status(500).json(err);
+  }
+}
+
+
+const UpdatePassword = async (req, res) => {
+  try {
+    const { _id, userPassword, newPassword } = req.body;
+    console.log(_id, userPassword, newPassword);
+
+    const user = await users.findOne({ _id });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.userPassword !== userPassword) {
+      return res.status(401).json({ message: "Incorrect current password" });
+    }
+
+    const result = await users.updateOne(
+      { _id },
+      { $set: { userPassword: newPassword } }
+    );
+
+    res.status(200).json({ message: "Password updated successfully", result });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err });
+  }
+};
+
+
+module.exports = {UpdatePassword,updatePassword, CheckUserID, getCustomersOrders, getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}
