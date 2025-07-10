@@ -55,4 +55,12 @@ const OrderDetailsSchema = mongoose.Schema({
 
   const OrderDelivery = mongoose.model("OrderDelivery",OrderDeliverySchema);
 
-module.exports = {produts,users, OrderDetails, OrderDelivery};
+const AdminSchema = mongoose.Schema({
+  _id : String,
+  AdminPass : String
+})
+
+const Admin = mongoose.model("Admin",AdminSchema);
+
+
+module.exports = {produts,users, OrderDetails, OrderDelivery, Admin};

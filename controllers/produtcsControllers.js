@@ -1,4 +1,4 @@
-const {produts,users, OrderDetails, OrderDelivery} = require('../models/products')
+const {produts,users, OrderDetails, OrderDelivery, Admin} = require('../models/products')
 
 const getProducts = async (req,res)=>{
     try{
@@ -12,17 +12,14 @@ const getProducts = async (req,res)=>{
 
 const postProduts = async(req,res)=>{
  
-    // console.log(data)
     const {_id,name,price,count,image,category,desc} = req.body;
-//     _id :"1",
-//     name:"hello",
-//     price:103,
-//     count:10,
-//     image: "null",
-//     category : "Grocery",
-//     desc : "it is a 75g madimix shop"
-//   };
+
     try{
+        const result = await produts.findOne({_id});
+        if(result){
+          const UpdateResult = await produts.updateOne({_id},{$set : {name,price,count,image,category,desc}});
+          res.status(200).json({"Message":"Updated"});
+        }
         const produt = new produts({_id,name,price,count,image,category,desc});
         await produt.save();
         res.status(200).json(produt);
@@ -306,5 +303,42 @@ const UpdatePassword = async (req, res) => {
   }
 };
 
+const AdminLogin = async(req,res)=>{
+  try{
+    const {AdminID,AdminPass} = req.body;
 
-module.exports = {UpdatePassword,updatePassword, CheckUserID, getCustomersOrders, getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}
+    const result = await Admin.findOne({_id:AdminID,AdminPass: AdminPass});
+    res.status(200).json(result);
+
+  }catch(err){
+    res.status(500).json({ message: "Server error", error: err });
+  }
+}
+
+const getProductsIDs = async(req,res)=>{
+  try{
+   
+  
+    const result = await produts.find();
+    const Ids = result.map(obj=>obj._id);
+    res.status(200).json(Ids);
+
+  }catch(err){
+    res.status(500).json({ message: "Server error", error: err });
+  }
+}
+
+const DeleteProduct =async(req,res)=>{
+  try{
+   
+    const {_id} = req.params;
+    const result = await produts.deleteOne({_id});
+
+    res.status(200).json(result);
+
+  }catch(err){
+    res.status(500).json({ message: "Server error", error: err });
+  }
+}
+
+module.exports = {DeleteProduct,getProductsIDs,AdminLogin,UpdatePassword,updatePassword, CheckUserID, getCustomersOrders, getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}

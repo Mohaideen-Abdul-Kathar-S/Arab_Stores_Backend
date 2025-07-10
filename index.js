@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const connectionDB = require('./config/db');
-const  {UpdatePassword,updatePassword, CheckUserID, getCustomersOrders,getOrderHistory,Delivery,getGroceryByID,deleteOrder, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin, updateUserDetails,getOrderDetails} = require('./controllers/produtcsControllers')
+const  {DeleteProduct,getProductsIDs,AdminLogin,UpdatePassword,updatePassword, CheckUserID, getCustomersOrders,getOrderHistory,Delivery,getGroceryByID,deleteOrder, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin, updateUserDetails,getOrderDetails} = require('./controllers/produtcsControllers')
 const app = express();
 const sendOTP = require('./controllers/sendOTP');
 connectionDB();
@@ -29,4 +29,7 @@ app.get('/getCustomersOrders',getCustomersOrders);
 app.post('/CheckUserID',CheckUserID);
 app.put('/updatePassword',updatePassword);
 app.post('/UpdatePassword',UpdatePassword);
+app.post('/AdminLogin',AdminLogin);
+app.get('/getProductsIDs',getProductsIDs);
+app.delete('/DeleteProduct/:_id',DeleteProduct);
 app.listen(4000,()=>console.log("server running on port 4000"));
