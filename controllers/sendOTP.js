@@ -25,6 +25,7 @@ const sendOTP = async (req, res) => {
   try {
     await transporter.sendMail(mailOptions);
     console.log("OTP sent to:", email);
+    console.log("OTP is:", otp);
     res.status(200).json({ message: "OTP sent", otp }); 
   } catch (err) {
     console.error(err);
@@ -32,4 +33,8 @@ const sendOTP = async (req, res) => {
   }
 };
 
-module.exports = sendOTP;
+
+
+
+
+module.exports = {sendOTP};

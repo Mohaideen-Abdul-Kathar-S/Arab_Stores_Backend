@@ -1,4 +1,4 @@
-const {produts,users, OrderDetails, OrderDelivery, Admin} = require('../models/products')
+const {Comment, produts,users, OrderDetails, OrderDelivery, Admin} = require('../models/products')
 
 const getProducts = async (req,res)=>{
     try{
@@ -43,6 +43,90 @@ const getGroceryBySearch = async (req, res) => {
     const { search } = req.params;
     console.log(search)
     const data = await produts.find({ name: { $regex: search, $options: 'i' },category:"grocery" });
+    res.status(200).json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Cannot find / not available" });
+  }
+};
+
+const getVegetables = async (req,res)=>{
+    try{
+        const data = await produts.find({category:"vegetables"});
+        res.status(200).json(data);
+
+    }catch(err){
+        res.status(500).json({message:"error in category fetching"});
+    }
+}
+const getVegetablesBySearch = async (req, res) => {
+  try {
+    const { search } = req.params;
+    console.log(search)
+    const data = await produts.find({ name: { $regex: search, $options: 'i' },category:"vegetables" });
+    res.status(200).json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Cannot find / not available" });
+  }
+};
+
+const getCoolDrinks = async (req,res)=>{
+    try{
+        const data = await produts.find({category:"cooldrinks"});
+        res.status(200).json(data);
+
+    }catch(err){
+        res.status(500).json({message:"error in category fetching"});
+    }
+}
+const getCoolDrinksBySearch = async (req, res) => {
+  try {
+    const { search } = req.params;
+    console.log(search)
+    const data = await produts.find({ name: { $regex: search, $options: 'i' },category:"cooldrinks" });
+    res.status(200).json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Cannot find / not available" });
+  }
+};
+
+const getSnacks = async (req,res)=>{
+    try{
+        const data = await produts.find({category:"snacks"});
+        res.status(200).json(data);
+
+    }catch(err){
+        res.status(500).json({message:"error in category fetching"});
+    }
+}
+const getSnacksBySearch = async (req, res) => {
+  try {
+    const { search } = req.params;
+    console.log(search)
+    const data = await produts.find({ name: { $regex: search, $options: 'i' },category:"snacks" });
+    res.status(200).json(data);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Cannot find / not available" });
+  }
+};
+
+const getStationaries = async (req,res)=>{
+    try{
+        const data = await produts.find({category:"stationaries"});
+        res.status(200).json(data);
+
+    }catch(err){
+        res.status(500).json({message:"error in category fetching"});
+    }
+}
+const getStationariesBySearch = async (req, res) => {
+  try {
+    const { search } = req.params;
+    console.log(search)
+    const data = await produts.find({ name: { $regex: search, $options: 'i' },category:"stationaries" });
     res.status(200).json(data);
   } catch (err) {
     console.error(err);
@@ -341,4 +425,48 @@ const DeleteProduct =async(req,res)=>{
   }
 }
 
-module.exports = {DeleteProduct,getProductsIDs,AdminLogin,UpdatePassword,updatePassword, CheckUserID, getCustomersOrders, getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}
+
+
+const sendComment = async (req, res) => {
+  const { type, message, email } = req.body;
+
+  try {
+    const newComment = new Comment({ type, message, email });
+    await newComment.save();
+
+    console.log("Comment Saved:", newComment);
+
+    res.status(200).json({
+      success: true,
+      msg: "Message sent to admin",
+      data: newComment, // returns saved doc with _id
+    });
+  } catch (err) {
+    console.error("Error saving comment:", err);
+    res.status(500).json({ success: false, msg: "Failed to save comment" });
+  }
+};
+
+
+const getComments = async (req, res) => {
+  try {
+    const comments = await Comment.find().sort({ createdAt: -1 });
+    res.status(200).json(comments);
+  } catch (err) {
+    res.status(500).json({ success: false, msg: "Failed to fetch comments" });
+  }
+};
+
+// Delete a comment by ID
+const deleteComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Comment.findByIdAndDelete(id);
+    res.status(200).json({ success: true, msg: "Comment deleted" });
+  } catch (err) {
+    res.status(500).json({ success: false, msg: "Failed to delete comment" });
+  }
+};
+
+
+module.exports = { getComments, deleteComment, sendComment, getStationariesBySearch, getStationaries, getSnacksBySearch, getSnacks, getCoolDrinksBySearch, getCoolDrinks,getVegetablesBySearch, getVegetables, DeleteProduct,getProductsIDs,AdminLogin,UpdatePassword,updatePassword, CheckUserID, getCustomersOrders, getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}

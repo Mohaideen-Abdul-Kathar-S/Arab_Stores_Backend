@@ -63,4 +63,26 @@ const AdminSchema = mongoose.Schema({
 const Admin = mongoose.model("Admin",AdminSchema);
 
 
-module.exports = {produts,users, OrderDetails, OrderDelivery, Admin};
+
+const commentSchema = new mongoose.Schema(
+  {
+    type: {
+      type: String,
+      enum: ["Request", "Complaint", "Suggestion"],
+      required: true,
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true } // automatically adds createdAt, updatedAt
+);
+
+const Comment = mongoose.model("Comment", commentSchema);
+
+module.exports = {Comment,produts,users, OrderDetails, OrderDelivery, Admin};
