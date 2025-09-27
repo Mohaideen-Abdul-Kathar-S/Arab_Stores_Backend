@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const connectionDB = require('./config/db');
-const  { getComments, deleteComment, sendComment,getStationariesBySearch, getStationaries, getSnacksBySearch, getSnacks, getCoolDrinksBySearch, getCoolDrinks,getVegetablesBySearch, getVegetables, DeleteProduct,getProductsIDs,AdminLogin,UpdatePassword,updatePassword, CheckUserID, getCustomersOrders,getOrderHistory,Delivery,getGroceryByID,deleteOrder, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin, updateUserDetails,getOrderDetails} = require('./controllers/produtcsControllers')
+const  { getExpenses, userExpense, getComments, deleteComment, sendComment,getStationariesBySearch, getStationaries, getSnacksBySearch, getSnacks, getCoolDrinksBySearch, getCoolDrinks,getVegetablesBySearch, getVegetables, DeleteProduct,getProductsIDs,AdminLogin,UpdatePassword,updatePassword, CheckUserID, getCustomersOrders,getOrderHistory,Delivery,getGroceryByID,deleteOrder, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin, updateUserDetails,getOrderDetails} = require('./controllers/produtcsControllers')
 const app = express();
 const { sendOTP} = require('./controllers/sendOTP');
 connectionDB();
@@ -44,7 +44,8 @@ app.delete('/DeleteProduct/:_id',DeleteProduct);
 app.post('/sendComment',sendComment);
 app.get("/getComments", getComments);
 app.delete("/deleteComment/:id", deleteComment);
-
+app.post('/userExpense', userExpense);
+app.get('/user/:userId/expenses',getExpenses);
 
 
 app.listen(4000,()=>console.log("server running on port 4000")); 

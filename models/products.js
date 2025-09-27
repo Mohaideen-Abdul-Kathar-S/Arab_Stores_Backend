@@ -20,7 +20,8 @@ const userSchema = mongoose.Schema({
   userAddr : String,
   userGender : String,
   userNOH : String,
-  userCart : Array
+  userCart : Array,
+  userExpense: Array,
 })
 
 const users = mongoose.model("users",userSchema);

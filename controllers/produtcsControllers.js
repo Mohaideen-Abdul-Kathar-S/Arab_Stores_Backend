@@ -305,7 +305,7 @@ const Delivery = async (req, res) => {
     const result = await val.save();
 
     // Delete the original
-    await OrderDetails.deleteOne({ _id: id });
+    // await OrderDetails.deleteOne({ _id: id });
 
     res.status(200).json(result);
   } catch (err) {
@@ -469,4 +469,86 @@ const deleteComment = async (req, res) => {
 };
 
 
-module.exports = { getComments, deleteComment, sendComment, getStationariesBySearch, getStationaries, getSnacksBySearch, getSnacks, getCoolDrinksBySearch, getCoolDrinks,getVegetablesBySearch, getVegetables, DeleteProduct,getProductsIDs,AdminLogin,UpdatePassword,updatePassword, CheckUserID, getCustomersOrders, getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}
+const userExpense = async (req, res) => {
+  try {
+    const { orderId, spendAmount } = req.body;
+    console.log("Expense API called for orderId:", orderId);
+
+    if (!orderId) {
+      return res.status(400).json({ message: "Order ID is required" });
+    }
+
+    // Find the order by ID
+    const order = await OrderDetails.findById(orderId);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    const userId = order.userID;
+    const products = order.product;
+
+    if (!products || products.length === 0) {
+      return res.status(400).json({ message: "No products in order" });
+    }
+
+    // Calculate total amount
+    let totalAmount = products.reduce((sum, item) => {
+      return sum + item.price * item.quantity;
+    }, 0);
+
+    // Find the user
+    const user = await users.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // Ensure userExpense is an array
+    if (!Array.isArray(user.userExpense)) {
+      user.userExpense = [];
+    }
+
+    // ✅ Always push a new expense object (don’t overwrite)
+    user.userExpense.push({
+      orderId,
+      totalAmount,
+      spendAmount,
+      date: new Date(),
+    });
+
+    await user.save();
+    await OrderDetails.deleteOne({ _id: orderId });
+
+    res.status(200).json({
+      message: "Expense added successfully",
+      userId,
+      orderId,
+      totalAmount,
+      userExpense: user.userExpense,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+const getExpenses = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("Get Expenses API called for userId:", userId);
+    // Find user by ID
+    const user = await users.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Return expenses array
+    res.status(200).json({
+      message: "User expenses fetched successfully",
+      userExpense: user.userExpense || [],
+    });
+  } catch (error) {
+    console.error("Error fetching user expenses:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+
+
+
+module.exports = {getExpenses, userExpense, getComments, deleteComment, sendComment, getStationariesBySearch, getStationaries, getSnacksBySearch, getSnacks, getCoolDrinksBySearch, getCoolDrinks,getVegetablesBySearch, getVegetables, DeleteProduct,getProductsIDs,AdminLogin,UpdatePassword,updatePassword, CheckUserID, getCustomersOrders, getOrderHistory, Delivery,getGroceryByID,deleteOrder, updateUserDetails, getProducts, postProduts, getGrocery, getGroceryBySearch, addToCart, getCartDetails, removeFromCart, postOrderDetails, userRegister,userLogin,getOrderDetails}
